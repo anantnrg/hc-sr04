@@ -1,12 +1,12 @@
 #![no_std]
 #![no_main]
 
+use cortex_m::delay::Delay;
+use cortex_m_rt::entry;
 use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
-
-use cortex_m_rt::entry;
-use stm32f1xx_hal::{delay::Delay, pac, prelude::*};
+use stm32f1xx_hal::{pac, prelude::*};
 
 use hc_sr04::{Error, HCSR04};
 
@@ -17,8 +17,8 @@ fn main() -> ! {
 
     let mut flash = dp.FLASH.constrain();
     let mut rcc = dp.RCC.constrain();
-    let clocks = rcc.cfgr.sysclk(8.mhz()).freeze(&mut flash.acr);
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+    let mut delay = Delay::new(cp.SYST, clocks.sysclk().to_Hz());
 
     let mut gpioa = dp.GPIOA.split();
 
