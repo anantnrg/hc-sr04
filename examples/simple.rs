@@ -15,9 +15,9 @@ fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
     let cp = cortex_m::Peripherals::take().unwrap();
 
-    let mut flash = dp.FLASH.constrain();
-    let mut rcc = dp.RCC.constrain();
+    let rcc = dp.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+
     let mut delay = Delay::new(cp.SYST, clocks.sysclk().to_Hz());
 
     let mut gpioa = dp.GPIOA.split();
