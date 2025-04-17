@@ -1,7 +1,7 @@
 #![no_std]
 
-use embedded_hal::delay::DelayNs;
-use embedded_hal::digital::{InputPin, OutputPin};
+use embedded_hal::blocking::delay::DelayMs;
+use embedded_hal::digital::v2::{InputPin, OutputPin};
 
 /// Speed of sound in cm/us (343 m/s => 0.0343 cm/ns * 1000 = 0.0343 cm/us)
 const SPEED_OF_SOUND_CM_PER_US: f32 = 0.0343;
@@ -16,7 +16,7 @@ impl<Trig, Echo, Delay> HCSR04<Trig, Echo, Delay>
 where
     Trig: OutputPin,
     Echo: InputPin,
-    Delay: DelayNs,
+    Delay: DelayMs<u16>,
 {
     /// Create a new HC-SR04 instance with `trig` and `echo` pins, and a delay provider
     pub fn new(trig: Trig, echo: Echo, delay: Delay) -> Self {
@@ -26,9 +26,9 @@ where
     pub fn dist(&mut self) -> Result<f32, Error> {
         // Send 10us pulse
         self.trig.set_low().map_err(|_| Error::Gpio)?;
-        self.delay.delay_us(2);
+        self.delay.delay_ms(2);
         self.trig.set_high().map_err(|_| Error::Gpio)?;
-        self.delay.delay_us(10);
+        self.delay.delay_ms(10);
         self.trig.set_low().map_err(|_| Error::Gpio)?;
 
         // Wait for echo to go HIGH
@@ -44,7 +44,7 @@ where
         let mut pulse_duration_us = 0u32;
         while self.echo.is_high().map_err(|_| Error::Gpio)? {
             pulse_duration_us += 1;
-            self.delay.delay_us(1);
+            self.delay.delay_ms(1);
             if pulse_duration_us > 30_000 {
                 return Err(Error::Timeout);
             }
