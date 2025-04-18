@@ -62,3 +62,9 @@ pub enum Error {
     Timeout,
     Gpio,
 }
+
+#[defmt::timestamp]
+fn timestamp() -> u64 {
+    // Return a timestamp, maybe from a timer or cycle counter
+    0 // TEMP: replace this with actual time if needed
+}
