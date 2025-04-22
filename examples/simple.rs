@@ -7,7 +7,7 @@ use rtt_target::rprintln;
 use stm32f1xx_hal::{pac, prelude::*};
 
 use cortex_m::Peripherals as CorePeripherals;
-use hc_sr04::{Error, HCSR04, Timer};
+use hc_sr04::{Error, HCSR04};
 
 #[entry]
 fn main() -> ! {
@@ -17,14 +17,14 @@ fn main() -> ! {
     let cp = CorePeripherals::take().unwrap();
 
     let mut flash = dp.FLASH.constrain();
-    let mut rcc = dp.RCC.constrain();
+    let rcc = dp.RCC.constrain();
     let clocks = rcc.cfgr.sysclk(72_000.kHz()).freeze(&mut flash.acr);
 
     let syst = cp.SYST;
     let dcb = cp.DCB;
     let dwt = cp.DWT;
 
-    let mut delay = cortex_m::delay::Delay::new(syst, clocks.sysclk().to_Hz());
+    let delay = cortex_m::delay::Delay::new(syst, clocks.sysclk().to_Hz());
 
     let mut gpiob = dp.GPIOB.split();
     let trig = gpiob.pb7.into_push_pull_output(&mut gpiob.crl);
